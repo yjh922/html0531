@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #wrapper{
+            width: 400px;
+            height: 500px;
+            background: yellow;
+            margin: auto;
+        }
+        #header{
+            width: 100%;
+            height: 50px;
+            background: lightblue;
+        }
+        #photo{
+            width: 100%;
+            height: 300px;
+            background: lightcoral;
+        }
+        #pic{
+            width: 100%;
+            height: 100%;
+        }
+        #msg{
+            width: 100%;
+            height: 100px;
+            background: lemonchiffon;
+        }
+        #footer{
+            width: 100%;
+            height: 50px;
+            background: lightgreen;
+        }
+    </style>
+    <script>
+        
+        let data=[
+            {
+                "title":"미국의 국기입니다",
+                "filename":"../images/flags/america.png",
+                "content": "미국"
+            },
+            {
+                "title":"호주의 국기입니다",
+                "filename":"../images/flags/aust.png",
+                "content": "호주"
+            },           
+            {
+                "title":"캐나다의 국기입니다",
+                "filename":"../images/flags/canada.jfif",
+                "content": "캐나다"
+            },           
+            {
+                "title":"영국의 국기입니다",
+                "filename":"../images/flags/england.png",
+                "content": "영국"
+            },           
+            {
+                "title":"프랑스의 국기입니다",
+                "filename":"../images/flags/france.png",
+                "content": "프랑스"
+            },           
+            {
+                "title":"독일의 국기입니다",
+                "filename":"../images/flags/german.jfif",
+                "content": "독일"
+            },           
+            {
+                "title":"한국의 국기입니다",
+                "filename":"../images/flags/korea.png",
+                "content": "한국"
+            },           
+            {
+                "title":"북한의 국기입니다",
+                "filename":"../images/flags/north.jfif",
+                "content": "북한"
+            },           
+            {
+                "title":"스페인의 국기입니다",
+                "filename":"../images/flags/spain.png",
+                "content": "스페인"
+            },           
+            {
+                "title":"스웨덴의 국기입니다",
+                "filename":"../images/flags/sweden.png",
+                "content": "스웨덴"
+            }
+        ];
+
+        let header;//제목나올곳
+        let pic;//큰 이미지
+        let msg;//메세지
+        let n=-1;//배열을 접글할 index
+        let flag=false;
+
+        function prev(){
+            n--;
+            showContent();
+        }
+        function next(){
+            n++;
+            showContent();
+        }
+
+        //다음 데이터 처리
+        function showContent(){
+            
+            let json=data[n];//n번쨰 요소 끄집어내기(json이 들어있다)
+
+            header.innerText=json.title;
+            pic.src=json.filename;
+            msg.innerText=json.content;
+
+        }
+
+        function init(){
+            header=document.getElementById("header");
+            pic=document.getElementById("pic");
+            msg=document.getElementById("msg");
+        }
+
+        function loop(){
+            if(flag){
+                next();
+            }
+        }
+        addEventListener("load", function(){
+            init();
+            next();
+            setInterval("loop()", 1000)
+        });
+    </script>
+</head>
+<body>
+    <div id="wrapper">
+        <div id="header"></div>
+        <div id="photo"><img id="pic"></div>
+        <div id="msg"></div>
+        <div id="footer">
+            <!-- js를 작성할 수 있는 영역
+            1)script 태그안에 작성
+            2)이벤트핸들러 안에 작성 onClick=""
+            3)a태그의 javascript: 선언시
+         -->
+            <a href="javascript:prev()">이전</a>
+            <a href="javascript:flag=true">자동</a>
+            <a href="javascript:flag=false">멈춤</a>
+            <a href="javascript:next()">다음</a>
+        </div>
+    </div>
+</body>
+</html>

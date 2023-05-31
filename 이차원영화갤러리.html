@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #wrapper {
+            width: 400px;
+            height: 200px;
+            background: yellow;
+            margin: auto;
+        }
+
+        #content {
+            width: 250px;
+            height: 100%;
+            background: lemonchiffon;
+            float: left;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #side {
+            width: 150px;
+            height: 100%;
+            background: lightcoral;
+            float: left;
+        }
+
+        #header {
+            width: 100%;
+            height: 50px;
+
+        }
+
+        #pic {
+            width: 100%;
+            height: 100px;
+        }
+
+        #footer {
+            width: 100%;
+            height: 50px;
+        }
+    </style>
+    <script src="../js/lib.js"></script>
+    <script src="../js/data.json"></script>
+    <script>
+        let content;
+        let header;
+        let pic;
+        let footer;
+        let targetX = 0;//사각형 포인터의 목표 x좌표
+        let targetY = 0;//사각형 포인터의 목표 y좌표
+        let movieArray = [];
+        let r;
+
+        //포인터 역할을 수행할 사각형 만들기 너비, 높이 50, 두께 2
+        class Rect {
+            constructor(container, x, y) {
+                this.a = 0.1;
+                this.container = container;
+                this.div;
+                this.x = x;
+                this.y = y;
+
+
+                this.div = document.createElement("div");
+                this.div.style.width = 50 + "px";
+                this.div.style.height = 50 + "px";
+                this.div.style.border = "2px solid red";
+                this.div.style.boxSizing = "border-box"
+                this.div.style.position = "absolute";
+                this.div.style.left = this.x + "px";
+                this.div.style.top = this.y + "px";
+
+                this.container.appendChild(this.div);
+            }
+
+            //감속도 운동으로 목표지점 가기
+            move() {
+                this.div.style.left = parseFloat(this.div.style.left) + this.a * (targetX - parseFloat(this.div.style.left)) + "px";
+                this.div.style.top = parseFloat(this.div.style.top) + this.a * (targetY - parseFloat(this.div.style.top)) + "px";
+            }
+        }
+
+        //영화를 정의한다(화면에 보여질 그랙피 감당)
+        class Movie {
+            constructor(json, container, width, height, x, y) {
+                let obj = this;
+                this.a = 0.1;
+                this.json = json;
+                this.container = container;//이 객체가 붙여질 부모
+                this.img;
+                this.src = this.json.url;//태어날때 이미지 경로를 넘겨받아 보관
+                this.width = width;//태어날때 너비를 넘겨받는다
+                this.height = height;//태어날때 높이를 넘겨받는다
+                this.x = x; //태어날때 위치할 left값
+                this.y = y;//태어날때 위치할 top값
+
+
+                this.img = document.createElement("img");
+                this.img.src = this.src;
+                this.img.style.width = this.width + "px";
+                this.img.style.height = this.height + "px";
+                this.img.style.position = "absolute";
+                this.img.style.left = this.x + "px";
+                this.img.style.top = this.y + "px";
+                this.img.style.border = "2px solid black";
+                this.img.style.boxSizing = "border-box";
+                this.img.style.opacity = 1;
+
+                //부모에 자식으로 추가하기
+                this.container.appendChild(this.img);
+
+                //이미지에 클릭 이벤트 연결
+                this.img.addEventListener("click", function () {
+                    //json 내장객체의 메서드 중 stringify()는 json을 문자열로 변환하는 기능
+                    //그 반대는 parse()라고 하며, 문자열로 된 json표기를 json 내장객체로 변환해준다
+                    //alert(JSON.stringify(obj.json));
+
+                    obj.showInfo();
+
+
+                    //현재 영화의 x,y 좌표 출력
+                    console.log("x는", obj.x, "y는", obj.y);
+                    targetX = obj.x;
+                    targetY = obj.y;
+
+                    //클릭한 영화 이미지의 opacity를 0으로 놓자
+                    obj.img.style.opacity = 0;//투명으로 놓자
+
+                });
+            }
+
+            render() {
+                this.img.style.opacity = parseFloat(this.img.style.opacity) + this.a * (1 - parseFloat(this.img.style.opacity));
+            }
+
+            showInfo() {
+                //영화제목출력하기
+                header.innerText = this.json.title;
+
+                //영화 이미지 출력하기
+                pic.src = this.json.url;
+
+                //영화정보 출력하기
+                footer.innerText = this.json.release_date;
+
+            }
+        }
+
+        //영화 썸네일 만들기
+        function createThunb() {
+            let n = 0;
+            for (let a = 0; a < 4; a++) {//층
+                //일차원배열을 준비
+                let arr = new Array(5);
+                for (let i = 0; i < 5; i++) {//호수
+                    //거푸집으로 부터 무비의 인스턴스 마들기
+                    let movie = new Movie(data.marvel[n], content, 50, 50, 50 * i, 50 * a);
+                    arr[i] = movie;
+                    n++;
+                }
+                //바깥쪽 반복문에서 일차원 배열을 추가하기
+                movieArray.push(arr);
+            }
+        }
+
+        function init() {
+            content = document.getElementById("content");
+            header = document.getElementById("header");
+            pic = document.getElementById("pic");
+            footer = document.getElementById("footer");
+        }
+
+        function loop() {
+            r.move();
+
+            //문서에 존재하는 모든 영화 인스턴스의 render()호출
+            for (let a = 0; a < movieArray.length; a++) {
+                for (let i = 0; i < movieArray[a].length; i++) {
+                    movieArray[a][i].render();
+                }
+            }
+        }
+
+        function createRect() {
+            r = new Rect(content, -200, 100);
+        }
+        function randomLoop() {
+            //랜덤하게 영화 1개 끄집어내기
+            let movie = movieArray[getRandom(movieArray.length)][getRandom(5)];
+            targetX = movie.x;
+            targetY = movie.y;
+
+            movie.showInfo();
+
+            movie.img.style.opacity = 0;//투명으로 놓자
+
+
+        }
+        addEventListener("load", function () {
+            init();
+            createThunb();
+            createRect();
+            setInterval("loop()", 10);
+
+            //2초 간격으로 targetX, targetY를랜덤한 값으로 대입
+            setInterval("randomLoop()", 2000);
+        });
+    </script>
+</head>
+
+<body>
+    <div id="wrapper">
+        <div id="content"></div>
+        <div id="side">
+            <div id="header"></div>
+            <img id="pic">
+            <div id="footer"></div>
+        </div>
+    </div>
+</body>
+
+</html>
